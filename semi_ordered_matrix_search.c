@@ -12,17 +12,24 @@ export OMP_NUM_THREADS=3
 #include <stdlib.h>
 
 //Function declaration
-void search(int rows, int columns, long int** matrix, int row_l, int row_r, int col_l, int col_r, long int x, int* i, int* j);
+void search(int rows, int columns, int** matrix, int row_l, int row_r, int col_l, int col_r, int x, int* i, int* j);
 
 int main (int argc, char *argv[]) 
 {
-	int nthreads;
+	//Number of threads
+	int nthreads = atoi(argv[1]);
 
+	//Index of the searched number in the matrix
 	int i = -1, j = -1;
 
-	long int K = 99999999;
+	//Number to be searched
+	int K = 9999;
 
-	int N = 40000;
+	//Input matrix size
+	int N = 10000;
+
+	//Setting the number of threads
+	omp_set_num_threads(nthreads);
 
 	
 	/**
@@ -35,7 +42,7 @@ int main (int argc, char *argv[])
 
 	
 	//Generate matrix
-	long int** matrix = (long int**)malloc(N*sizeof(long int*));
+	int** matrix = (int**)malloc(N*sizeof(int*));
 
 	//double start_time = omp_get_wtime();
 
@@ -43,10 +50,10 @@ int main (int argc, char *argv[])
 	//Create a semi-ordered matrix
 	//#pragma omp parallel for
 	for(int x = 0;x<N;x++){
-		matrix[x] = (long int*)malloc(N*sizeof(long int));
+		matrix[x] = (int*)malloc(N*sizeof(int));
 
 		for(int y = 0;y<N;y++){
-			matrix[x][y] = (x*(long int)N)+(y+1);
+			matrix[x][y] = (x*(int)N)+(y+1);
 			//printf("%d\n",matrix[x][y]);
 		}
 	}
@@ -80,7 +87,7 @@ int main (int argc, char *argv[])
 }
 
 
-void search(int rows, int columns, long int** matrix, int row_l, int row_r, int col_l, int col_r, long int x, int* i, int* j){
+void search(int rows, int columns, int** matrix, int row_l, int row_r, int col_l, int col_r, int x, int* i, int* j){
 
 	/**
 	int tid = omp_get_thread_num();
