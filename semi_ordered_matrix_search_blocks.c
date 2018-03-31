@@ -49,16 +49,20 @@ int main (int argc, char *argv[])
 	colLow[0] = 0;
 	colHigh[0] = N-1;
 
+	double divideTime = -omp_get_wtime();
+
 	//Divide the matrix blocks among threads
 	divideMatrix(0,rowLow,rowHigh,colLow,colHigh,nthreads);
 	
+	divideTime += omp_get_wtime();
+
 	double start_time = omp_get_wtime();
 
 	/* Fork a team of threads giving them their own copies of variables */
 	#pragma omp parallel
 	{	
 		int threadNo = omp_get_thread_num();
-		printf("%d %d %d %d\n",rowLow[threadNo], rowHigh[threadNo], colLow[threadNo], colHigh[threadNo]);
+		// printf("%d %d %d %d\n",rowLow[threadNo], rowHigh[threadNo], colLow[threadNo], colHigh[threadNo]);
 		search(matrix, rowLow[threadNo], rowHigh[threadNo], colLow[threadNo], colHigh[threadNo], K, &i, &j);
 	}  /* All threads join master thread and disband */
 
@@ -67,7 +71,7 @@ int main (int argc, char *argv[])
 
 	printf("%d %d\n",i,j);
 
-	printf("Time: %lf\n", time, divideTime);
+	printf("Time: %lf time:%lf\n", time, divideTime);
 
 	return 0;
 }
@@ -75,12 +79,7 @@ int main (int argc, char *argv[])
 
 void search(int** matrix, int row_l, int row_r, int col_l, int col_r, int x, int* i, int* j)
 {
-	/**
-	int tid = omp_get_thread_num();
-    printf("Hello world from omp thread %d\n", tid);
-    **/
-
-	if(*i != (-1) && *j != (-1))
+	if((*i == (-1)) || (*j == (-1)))
 	{
 		if(row_l>row_r || col_l>col_r)
 			return;
